@@ -1,0 +1,120 @@
+﻿<!DOCTYPE html>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<a href="admin.html"  class="btn btn--s">&lt;</a>&nbsp;&nbsp;<strong>General Settings</strong>
+	<hr>
+	<form action="/post/user" method="post">
+        <input type="hidden" name="afterpost" value="/user.html">
+		<table border="0"  cellspacing="0" cellpadding="3" >
+			<tr>
+				<td align="right">Sample User Data 1</td>
+				<td>
+				<input type="text" id="user1" name="user1" value=""></td>
+			</tr>
+            <tr>
+                <td align="right">Sample User Data 2</td>
+                <td>
+                    <input type="text" id="user2" name="user2" value="">
+                </td>
+            </tr>
+            <tr>
+                <td align="right">Sample User Data 3</td>
+                <td>
+                    <input type="text" id="user3" name="user3" value="">
+                </td>
+            </tr>
+			<tr>
+					<td colspan="2" align="center">
+					<input type="submit" style="width:150px" class="btn btn--m btn--blue" value="Save"></td>
+				</tr>
+        <tr>
+                <td align="right">Chip Size</td>
+                <td>
+                    <span id="chipsize"></span>
+                </td>
+            </tr>
+        <tr>
+                <td align="right">Sketch Size</td>
+                <td>
+                    <span id="sketchsize"></span>
+                </td>
+            </tr>
+        <tr>
+                <td align="right">Free Space</td>
+                <td>
+                    <span id="freespace"></span>
+                </td>
+            </tr>
+        <tr>
+                <td align="right">FS Total Bytes</td>
+                <td>
+                    <span id="fstotal"></span>
+                </td>
+            </tr>
+        <tr>
+                <td align="right">FS Used Bytes</td>
+                <td>
+                    <span id="fsused"></span>
+                </td>
+            </tr>
+        <tr>
+                <td align="right">FS Block Size</td>
+                <td>
+                    <span id="fsblock"></span>
+                </td>
+            </tr>
+        <tr>
+                <td align="right">FS Page Size</td>
+                <td>
+                    <span id="fspage"></span>
+                </td>
+            </tr>
+        <tr>
+                <td align="right">FS Max Open Files</td>
+                <td>
+                    <span id="fsmaxopen"></span>
+                </td>
+            </tr>
+        <tr>
+                <td align="right">FS Max Path Length</td>
+                <td>
+                    <span id="fsmaxpath"></span>
+                </td>
+            </tr>
+			</table>
+		</form>
+		<script>
+
+
+
+			window.onload = function ()
+			{
+				load("style.css","css", function()
+				{
+					load("microajax.js","js", function()
+					{
+						setValues("/rest/userdemo");
+					});
+				});
+			}
+			function load(e, t, n) {
+				if ("js" == t) {
+					var a = document.createElement("script");
+					a.src = e, a.type = "text/javascript",
+					a.async = !1,
+					a.onload = function () {
+						n()
+					},
+					document.getElementsByTagName("head")[0].appendChild(a)
+				} else if ("css" == t) {
+					var a = document.createElement("link");
+					a.href = e, a.rel = "stylesheet", a.type = "text/css",
+					a.async = !1,
+					a.onload = function () {
+						n()
+					},
+					document.getElementsByTagName("head")[0].appendChild(a)
+				}
+			}
+
+		</script>
