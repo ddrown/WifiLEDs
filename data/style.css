@@ -93,3 +93,8 @@ th {
         max-width: 16em !important;
     }
 }
+
+label.formlabel {
+  width: 12em;
+  display: inline-block;
+}

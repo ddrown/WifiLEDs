@@ -11,80 +11,74 @@
 #include <Hash.h>
 #include "FastLED.h"
 
+#define PATTERN_BPM 0
+#define PATTERN_STATIC 1
+#define PATTERN_WALK 2
+#define PATTERN_FADE 3
+
+struct LEDconfig {
+  uint8_t pattern;
+  CRGB static_color;
+  uint8_t brightness;
+} settings = {PATTERN_BPM, CRGB::Black, 255};
+
+uint8_t gHue = 0;
+
 void callbackREST(AsyncWebServerRequest *request) {
-	//its possible to test the url and do different things, 
-	//test you rest URL
-	if (request->url() == "/rest/userdemo")	{
-    FSInfo fs_info;
-		//contruct and send and desired repsonse
-		// get sample data from json file
-		String data = "";
-		ESPHTTPServer.load_user_config("user1", data);
-		String values = "user1|"+ data +"|input\n";
+	if (request->url() == "/rest/user")	{
+    uint32_t color;
+    String color_s;
+		String values = "pattern|"+ String(settings.pattern) +"|input\n";
 
-		ESPHTTPServer.load_user_config("user2", data);
-		values += "user2|" + data + "|input\n";
+    color = settings.static_color[0];
+    color = color << 8 | settings.static_color[1];
+    color = color << 8 | settings.static_color[2];
+    color_s = String(color, HEX);
+    while(color_s.length() < 6) {
+      color_s = "0"+color_s;
+    }
+		values += "static_color|#" + color_s + "|input\n";
 
-		ESPHTTPServer.load_user_config("user3", data);
-		values += "user3|" + data + "|input\n";
-
-    values += "chipsize|" + String(ESP.getFlashChipRealSize()) + "|div\n";
-    values += "sketchsize|" + String(ESP.getSketchSize()) + "|div\n";
-    values += "freespace|" + String(ESP.getFreeSketchSpace()) + "|div\n";
-
-    SPIFFS.info(fs_info);
-    values += "fstotal|" + String(fs_info.totalBytes) + "|div\n";
-    values += "fsused|" + String(fs_info.usedBytes) + "|div\n";
-    values += "fsblock|" + String(fs_info.blockSize) + "|div\n";
-    values += "fspage|" + String(fs_info.pageSize) + "|div\n";
-    values += "fsmaxopen|" + String(fs_info.maxOpenFiles) + "|div\n";
-    values += "fsmaxpath|" + String(fs_info.maxPathLength) + "|div\n";
+    values += "brightness|" + String(settings.brightness) + "|input\n";
 
 		request->send(200, "text/plain", values);
 		values = "";
-	}	else { 
-		//its possible to test the url and do different things, 
-		String values = "message:Hello world! \nurl:" + request->url() + "\n";
+	}	else {
+		String values = "message:Default Response\nurl:" + request->url() + "\n";
 		request->send(200, "text/plain", values);
 		values = "";
 	}
 }
 
 void callbackPOST(AsyncWebServerRequest *request) {
-	//its possible to test the url and do different things, 
 	if (request->url() == "/post/user")	{
 		String target = "/";
 
 		for (uint8_t i = 0; i < request->args(); i++) {
-      DEBUGLOG("Arg %d: %s\r\n", i, request->arg(i).c_str());
-			Serial.print(request->argName(i));
-			Serial.print(" : ");
-			Serial.println(ESPHTTPServer.urldecode(request->arg(i)));
-
-			//check for post redirect
-			if (request->argName(i) == "afterpost") {
-				target = ESPHTTPServer.urldecode(request->arg(i));
-			} else {
-				ESPHTTPServer.save_user_config(request->argName(i), request->arg(i));
-			}
+      if (request->argName(i) == "brightness") {
+        settings.brightness = request->arg(i).toInt();
+        FastLED.setBrightness(settings.brightness);
+        ESPHTTPServer.save_user_config(request->argName(i), request->arg(i));
+        
+      } else if (request->argName(i) == "pattern") {
+        settings.pattern = request->arg(i).toInt();
+        ESPHTTPServer.save_user_config(request->argName(i), request->arg(i));
+        
+      } else if (request->argName(i) == "static_color") {
+        const char *color = request->arg(i).c_str();
+        if(color[0] == '#') {
+          int32_t new_color = strtol(color+1, 0, 16);
+          if(new_color >= 0 && new_color < 16777216) {
+            settings.static_color = (uint32_t)new_color;
+            ESPHTTPServer.save_user_config("static_color", String(new_color));
+          }
+        }
+      }
     }
 
 		request->redirect(target);
-	} else if(request->url() == "/post/led")  {
-    int brightness = 0;
-    String values = "LED";
-    for (uint8_t i = 0; i < request->args(); i++) {
-      if (request->argName(i) == "brightness") {
-        brightness = request->arg(i).toInt();
-        FastLED.setBrightness(brightness);
-        values = values + " set to brightness " + String(brightness);
-      }
-    }
-    values = values + "\n";
-    request->send(200, "text/plain", values);
-    values = "";
 	}	else {
-		String values = "message:Hello world! \nurl:" + request->url() + "\n";
+		String values = "message:Default Post\nurl:" + request->url() + "\n";
 		request->send(200, "text/plain", values);
 		values = "";
 	}
@@ -102,32 +96,56 @@ FASTLED_USING_NAMESPACE
 #define NUM_LEDS    100
 CRGB leds[NUM_LEDS];
 
-#define BRIGHTNESS         255
 #define FRAMES_PER_SECOND  120
+
+void load_user_config() {
+  String data = "";
+  
+  ESPHTTPServer.load_user_config("pattern", data);
+  if(data.length() > 0)
+    settings.pattern = data.toInt();
+    
+  ESPHTTPServer.load_user_config("static_color", data);
+  if(data.length() > 0)
+    settings.static_color = data.toInt();
+    
+  ESPHTTPServer.load_user_config("brightness", data);
+  if(data.length() > 0)
+    settings.brightness = data.toInt();
+}
 
 void setup() {
   // WiFi is started inside library
   SPIFFS.begin(); // Not really needed, checked inside library and started if needed
   ESPHTTPServer.begin(&SPIFFS);
 
-	//set optional callback
 	ESPHTTPServer.setRESTCallback(callbackREST);
-
-	//set optional callback
- 
 	ESPHTTPServer.setPOSTCallback(callbackPOST);
   
   // tell FastLED about the LED strip configuration
-  FastLED.addLeds<LED_TYPE,DATA_PIN,COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE,DATA_PIN,COLOR_ORDER>(leds, NUM_LEDS).setCorrection(Typical8mmPixel);
 
-  // set master brightness control
-  FastLED.setBrightness(BRIGHTNESS);
+  load_user_config();
+  
+  FastLED.setBrightness(settings.brightness);
 }
 
-uint8_t gHue = 0; // rotating "base color" used by many of the patterns
-
 void loop() {
-  bpm();
+  switch(settings.pattern) {
+    case PATTERN_STATIC:
+      static_pattern();
+      break;
+    case PATTERN_WALK:
+      walk_pattern();
+      break;
+    case PATTERN_FADE:
+      fade_pattern();
+      break;
+    case PATTERN_BPM:
+    default:
+      bpm();
+      break;
+  }
 
   // send the 'leds' array out to the actual LED strip
   FastLED.show();  
@@ -151,3 +169,26 @@ void bpm() {
     leds[i] = ColorFromPalette(palette, gHue+i, sin8(i*4-fadestep));
   }
 }
+
+void static_pattern() {
+  for( int i = 0; i < NUM_LEDS; i++) {
+    leds[i] = settings.static_color;
+  } 
+}
+
+void walk_pattern() {  
+  for(int i = 0; i < NUM_LEDS; i++) {
+    leds[i] = settings.static_color;
+    leds[i] %= sin8(gHue+i);
+  } 
+}
+
+void fade_pattern() {
+  CRGB faded_color = settings.static_color;
+  faded_color %= sin8(gHue);
+  
+  for(int i = 0; i < NUM_LEDS; i++) {
+    leds[i] = faded_color;
+  } 
+}
+
