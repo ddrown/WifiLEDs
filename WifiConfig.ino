@@ -41,6 +41,8 @@ void callbackREST(AsyncWebServerRequest *request) {
 
     values += "brightness|" + String(settings.brightness) + "|input\n";
 
+    values += "compile_date|" __DATE__ " " __TIME__ "|div\n";
+
 		request->send(200, "text/plain", values);
 		values = "";
 	}	else {
