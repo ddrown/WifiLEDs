@@ -17,6 +17,7 @@
 #define PATTERN_FADE 3
 #define PATTERN_TWINKLE 4
 #define PATTERN_PALETTE 5
+#define PATTERN_MARCH 6
 
 #define STATIC_COLOR_COUNT 16
 struct LEDconfig {
@@ -68,6 +69,7 @@ void callbackPOST(AsyncWebServerRequest *request) {
       } else if (request->argName(i) == "pattern") {
         settings.pattern = request->arg(i).toInt();
         ESPHTTPServer.save_user_config(request->argName(i), request->arg(i));
+        gHue = 0;
         
       } else if (request->argName(i).length() >= 14 && request->argName(i).length() <= 16 && request->argName(i).startsWith("static_color_")) {
         String colorid_s = request->argName(i).substring(13);
@@ -161,6 +163,9 @@ void loop() {
     case PATTERN_PALETTE:
       palette_pattern();
       break;
+    case PATTERN_MARCH:
+      march_pattern();
+      break;
     case PATTERN_BPM:
     default:
       bpm();
@@ -253,18 +258,33 @@ void fade_pattern() {
   } 
 }
 
+#define BLINK_LEDS 4
+void blink_leds() {
+  static uint8_t blink_leds[BLINK_LEDS] = {0,1,2,3};
+  static uint8_t start_gHue[BLINK_LEDS] = {0,255,253,245};
+  
+  for(uint8_t i = 0; i < BLINK_LEDS; i++) {
+    uint8_t led = blink_leds[i];
+    uint8_t last_gHue = start_gHue[i];
+
+    if((uint8_t)(gHue-last_gHue) >= 25) { // every 1000ms (25*40ms)
+      led = blink_leds[i] = secureRandom(NUM_LEDS);
+      last_gHue = start_gHue[i] = gHue + 1 - secureRandom(3);
+    }
+    leds[led] %= cos8((uint8_t)(gHue-last_gHue)*10);
+  }
+}
+
 void twinkle_pattern() {
-  static uint8_t last_gHue = 0, last_led = 0, flipflop = 0;
+  static uint8_t last_gHue = 0, flipflop = 0;
 
   if((uint8_t)(gHue-last_gHue) >= 25) { // every 1000ms (25*40ms)
     last_gHue = gHue;
-    last_led = secureRandom(NUM_LEDS/4);
     flipflop = (flipflop + 1) % 12;
   }
 
   if(flipflop == 5 || flipflop == 11) {
     for(int i = 0; i < NUM_LEDS; i++) {
-      uint8_t mod_i = i % (NUM_LEDS/4);
       CRGB c1, c2;
       if(flipflop == 5) {
         if(i % 2) {
@@ -283,25 +303,47 @@ void twinkle_pattern() {
           c1 = settings.static_colors[1];
         }
       }
-      leds[i] = blend(c1, c2, (gHue-last_gHue)*10);
-      
-      if(mod_i == last_led) {
-        leds[i] %= cos8((gHue-last_gHue)*10);
-      }     
+      leds[i] = blend(c1, c2, (gHue-last_gHue)*10);    
     }
+
+    blink_leds();
     return;
   }
 
   for(int i = 0; i < NUM_LEDS; i++) {
-    uint8_t mod_i = i % (NUM_LEDS/4);
-    
     if(flipflop >= 5) { // every ~5 seconds
       leds[i] = (i % 2) ? settings.static_colors[0] : settings.static_colors[1];
     } else {
       leds[i] = (i % 2) ? settings.static_colors[1] : settings.static_colors[0];
     }
-    if(mod_i == last_led) {
-      leds[i] %= cos8((gHue-last_gHue)*10);
+  }
+
+  blink_leds();
+}
+
+void march_pattern() {
+  uint8_t substep = gHue % 64;
+  
+  for(int i = 0; i < NUM_LEDS; i++) {
+    CRGB c1, c2;
+    
+    if(substep >= 32) {
+      if(i % 2) {
+        c2 = settings.static_colors[0];
+        c1 = settings.static_colors[1];
+      } else {
+        c1 = settings.static_colors[0];
+        c2 = settings.static_colors[1];
+      }
+    } else {
+      if(i % 2) {
+        c1 = settings.static_colors[0];
+        c2 = settings.static_colors[1];
+      } else {
+        c2 = settings.static_colors[0];
+        c1 = settings.static_colors[1];
+      }
     }
+    leds[i] = blend(c1, c2, (substep % 32)*8);
   }
 }

@@ -7,7 +7,17 @@
   <script src="microajax.js" type="text/javascript"></script>
   <script type="text/javascript">
   window.onload = function() {
-    setValues("/rest/user");
+    setValues("/rest/user",showcolors);
+  }
+  var pattern_colors = [16, 1, 1, 1, 2, 16, 2];
+  function showcolors() {
+    var patternid = document.getElementById("pattern").value;
+    var colorcount = pattern_colors[patternid];
+    for(var i = 0; i < 16; i++) {
+      document.getElementById("static_color_"+i).style.display = (i < colorcount) ? "inline" : "none";
+      document.getElementById("label_"+i).style.display = (i < colorcount) ? "inline" : "none";
+      document.getElementById("br_"+i).style.display = (i < colorcount) ? "block" : "none";
+    }
   }
   </script>
 </head>
@@ -17,47 +27,48 @@
     <input type="number" id="brightness" name="brightness"/><br/>
 
     <label for="pattern" class=formlabel>Pattern ID</label>
-    <select id="pattern" name="pattern">
+    <select id="pattern" name="pattern" onchange="showcolors()">
       <option value=0>BPM</option>
       <option value=1>Static</option>
       <option value=2>Walk</option>
       <option value=3>Fade</option>
       <option value=4>Twinkle</option>
       <option value=5>Palette</option>
+      <option value=6>March</option>
     </select><br/>
 
-    <label for="static_color_0" class=formlabel>Static Color #0</label>
-    <input type="color" id="static_color_0" name="static_color_0"/><br/>
-    <label for="static_color_1" class=formlabel>Static Color #1</label>
-    <input type="color" id="static_color_1" name="static_color_1"/><br/>
-    <label for="static_color_2" class=formlabel>Static Color #2</label>
-    <input type="color" id="static_color_2" name="static_color_2"/><br/>
-    <label for="static_color_3" class=formlabel>Static Color #3</label>
-    <input type="color" id="static_color_3" name="static_color_3"/><br/>
-    <label for="static_color_4" class=formlabel>Static Color #4</label>
-    <input type="color" id="static_color_4" name="static_color_4"/><br/>
-    <label for="static_color_5" class=formlabel>Static Color #5</label>
-    <input type="color" id="static_color_5" name="static_color_5"/><br/>
-    <label for="static_color_6" class=formlabel>Static Color #6</label>
-    <input type="color" id="static_color_6" name="static_color_6"/><br/>
-    <label for="static_color_7" class=formlabel>Static Color #7</label>
-    <input type="color" id="static_color_7" name="static_color_7"/><br/>
-    <label for="static_color_8" class=formlabel>Static Color #8</label>
-    <input type="color" id="static_color_8" name="static_color_8"/><br/>
-    <label for="static_color_9" class=formlabel>Static Color #9</label>
-    <input type="color" id="static_color_9" name="static_color_9"/><br/>
-    <label for="static_color_10" class=formlabel>Static Color #10</label>
-    <input type="color" id="static_color_10" name="static_color_10"/><br/>
-    <label for="static_color_11" class=formlabel>Static Color #11</label>
-    <input type="color" id="static_color_11" name="static_color_11"/><br/>
-    <label for="static_color_12" class=formlabel>Static Color #12</label>
-    <input type="color" id="static_color_12" name="static_color_12"/><br/>
-    <label for="static_color_13" class=formlabel>Static Color #13</label>
-    <input type="color" id="static_color_13" name="static_color_13"/><br/>
-    <label for="static_color_14" class=formlabel>Static Color #14</label>
-    <input type="color" id="static_color_14" name="static_color_14"/><br/>
-    <label for="static_color_15" class=formlabel>Static Color #15</label>
-    <input type="color" id="static_color_15" name="static_color_15"/><br/>
+    <label for="static_color_0" id="label_0" class=formlabel>Static Color #0</label>
+    <input type="color" id="static_color_0" name="static_color_0"/><br id="br_0"/>
+    <label for="static_color_1" id="label_1" class=formlabel>Static Color #1</label>
+    <input type="color" id="static_color_1" name="static_color_1"/><br id="br_1"/>
+    <label for="static_color_2" id="label_2" class=formlabel>Static Color #2</label>
+    <input type="color" id="static_color_2" name="static_color_2"/><br id="br_2"/>
+    <label for="static_color_3" id="label_3" class=formlabel>Static Color #3</label>
+    <input type="color" id="static_color_3" name="static_color_3"/><br id="br_3"/>
+    <label for="static_color_4" id="label_4" class=formlabel>Static Color #4</label>
+    <input type="color" id="static_color_4" name="static_color_4"/><br id="br_4"/>
+    <label for="static_color_5" id="label_5" class=formlabel>Static Color #5</label>
+    <input type="color" id="static_color_5" name="static_color_5"/><br id="br_5"/>
+    <label for="static_color_6" id="label_6" class=formlabel>Static Color #6</label>
+    <input type="color" id="static_color_6" name="static_color_6"/><br id="br_6"/>
+    <label for="static_color_7" id="label_7" class=formlabel>Static Color #7</label>
+    <input type="color" id="static_color_7" name="static_color_7"/><br id="br_7"/>
+    <label for="static_color_8" id="label_8" class=formlabel>Static Color #8</label>
+    <input type="color" id="static_color_8" name="static_color_8"/><br id="br_8"/>
+    <label for="static_color_9" id="label_9" class=formlabel>Static Color #9</label>
+    <input type="color" id="static_color_9" name="static_color_9"/><br id="br_9"/>
+    <label for="static_color_10" id="label_10" class=formlabel>Static Color #10</label>
+    <input type="color" id="static_color_10" name="static_color_10"/><br id="br_10"/>
+    <label for="static_color_11" id="label_11" class=formlabel>Static Color #11</label>
+    <input type="color" id="static_color_11" name="static_color_11"/><br id="br_11"/>
+    <label for="static_color_12" id="label_12" class=formlabel>Static Color #12</label>
+    <input type="color" id="static_color_12" name="static_color_12"/><br id="br_12"/>
+    <label for="static_color_13" id="label_13" class=formlabel>Static Color #13</label>
+    <input type="color" id="static_color_13" name="static_color_13"/><br id="br_13"/>
+    <label for="static_color_14" id="label_14" class=formlabel>Static Color #14</label>
+    <input type="color" id="static_color_14" name="static_color_14"/><br id="br_14"/>
+    <label for="static_color_15" id="label_15" class=formlabel>Static Color #15</label>
+    <input type="color" id="static_color_15" name="static_color_15"/><br id="br_15"/>
 
     <input type="submit" style="width:150px" class="btn btn--m btn--blue" value="Save">
   </form>

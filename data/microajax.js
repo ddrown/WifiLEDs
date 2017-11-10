@@ -37,7 +37,7 @@ function microAjax(B,A){
     }
 }
 
-function setValues(url)
+function setValues(url,afterfunc)
 {
 	microAjax(url, function (res) {
 	    res.split(String.fromCharCode(10)).forEach(
@@ -52,6 +52,9 @@ function setValues(url)
 				    document.getElementById(fields[0]).checked  = fields[1];
 		        }
             }
-        );
+            );
+            if(typeof afterfunc === "function") {
+              afterfunc();
+            }
 	});
 }
