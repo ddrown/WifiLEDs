@@ -18,6 +18,7 @@
 #define PATTERN_TWINKLE 4
 #define PATTERN_PALETTE 5
 #define PATTERN_MARCH 6
+#define PATTERN_CIRCLE 7
 
 #define STATIC_COLOR_COUNT 16
 struct LEDconfig {
@@ -165,6 +166,9 @@ void loop() {
       break;
     case PATTERN_MARCH:
       march_pattern();
+      break;
+    case PATTERN_CIRCLE:
+      circle_pattern();
       break;
     case PATTERN_BPM:
     default:
@@ -347,3 +351,36 @@ void march_pattern() {
     leds[i] = blend(c1, c2, (substep % 32)*8);
   }
 }
+
+void circle_pattern() {
+  if(gHue > 251)
+    gHue = 0;
+
+  for(int i = 0; i < NUM_LEDS; i++) {
+    uint8_t color_step = (gHue + i) % 252;
+    CRGB c1, c2;
+
+    switch(color_step/63) {
+      case 0:
+        c1 = settings.static_colors[0];
+        c2 = settings.static_colors[1];
+        break;
+      case 1:
+        c1 = settings.static_colors[1];      
+        c2 = settings.static_colors[2];
+        break;     
+      case 2:
+        c1 = settings.static_colors[2];
+        c2 = settings.static_colors[3];
+        break;     
+      case 3:
+      default:
+        c1 = settings.static_colors[3];      
+        c2 = settings.static_colors[0];
+        break;
+    }
+    
+    leds[i] = blend(c1, c2, cubicwave8((color_step % 63)*2));
+  }
+}
+
