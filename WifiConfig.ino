@@ -28,6 +28,7 @@ struct LEDconfig {
 } settings = {pattern: PATTERN_BPM, brightness: 255};
 
 uint8_t gHue = 0;
+unsigned long led_ms;
 
 void callbackREST(AsyncWebServerRequest *request) {
 	if (request->url() == "/rest/user")	{
@@ -53,6 +54,9 @@ void callbackREST(AsyncWebServerRequest *request) {
     values += "compile_date|" __DATE__ " " __TIME__ "|div\n";
 
 		request->send(200, "text/plain", values);
+	} else if (request->url() == "/rest/ledms")  {
+    String values = "led_ms|"+ String(led_ms) +"|div\n";
+    request->send(200, "text/plain", values);
 	}	else {
 		String values = "message:Default Response\nurl:" + request->url() + "\n";
 		request->send(200, "text/plain", values);
@@ -107,7 +111,7 @@ FASTLED_USING_NAMESPACE
 #define NUM_LEDS    100
 CRGB leds[NUM_LEDS];
 
-#define FRAMES_PER_SECOND  120
+#define UPDATE_MS_INTERVAL 40
 
 void load_user_config() {
   String data = "";
@@ -148,6 +152,8 @@ void setup() {
 }
 
 void loop() {
+  unsigned long start = millis();
+  
   switch(settings.pattern) {
     case PATTERN_STATIC:
       static_pattern();
@@ -177,16 +183,16 @@ void loop() {
   }
 
   // send the 'leds' array out to the actual LED strip
-  FastLED.show();  
+  FastLED.show();
+
+  led_ms = millis()-start;
   
-  unsigned long start = millis();
   do {
     delay(1);
     ESPHTTPServer.handle();
-  } while((millis()-start) < (1000/FRAMES_PER_SECOND));
+  } while((millis()-start) < UPDATE_MS_INTERVAL);
 
-  // do some periodic updates
-  EVERY_N_MILLISECONDS( 40 ) { gHue++; } // slowly cycle the "base color" through the rainbow
+  gHue++; // slowly cycle the "base color" through the rainbow
 }
 
 void bpm() {
