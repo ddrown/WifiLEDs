@@ -21,10 +21,11 @@
   }
   var premade_patterns = [
     {brightness: 255, pattern: 4, static_color_0: "#FF0000", static_color_1: "#FFFFFF"}, // 0: Candy Cane
-    {brightness: 255, pattern: 4, static_color_0: "#FF0000", static_color_1: "#00FF00"}, // 1: Red/Green Twinkle
-    {brightness: 255, pattern: 7, static_color_0: "#FF0000", static_color_1: "#FFFFFF", static_color_2: "#00FF00", static_color_3: "#000000"}, // 2: Red/White/Green/Black circle
-    {brightness: 255, pattern: 7, static_color_0: "#FF0000", static_color_1: "#808000", static_color_2: "#00FF00", static_color_3: "#808000"}, // 3: Red/Yellow/Green/Yellow circle
-    {brightness: 255, pattern: 7, static_color_0: "#0000FF", static_color_1: "#00FF00", static_color_2: "#FFFF00", static_color_3: "#FF0000"}, // 4: Rainbow circle
+    {brightness: 255, pattern: 4, static_color_0: "#DD8F00", static_color_1: "#FFFFFF"}, // 1: Yellow/White Twinkle
+    {brightness: 255, pattern: 4, static_color_0: "#FF0000", static_color_1: "#00FF00"}, // 2: Red/Green Twinkle
+    {brightness: 255, pattern: 7, static_color_0: "#FF0000", static_color_1: "#FFFFFF", static_color_2: "#00FF00", static_color_3: "#000000"}, // 3: Red/White/Green/Black circle
+    {brightness: 255, pattern: 7, static_color_0: "#FF0000", static_color_1: "#808000", static_color_2: "#00FF00", static_color_3: "#808000"}, // 4: Red/Yellow/Green/Yellow circle
+    {brightness: 255, pattern: 7, static_color_0: "#0000FF", static_color_1: "#00FF00", static_color_2: "#FFFF00", static_color_3: "#FF0000"}, // 5: Rainbow circle
     ];
   function show_pattern(id) {
     var pattern_data = premade_patterns[id];
@@ -90,10 +91,11 @@
   <div>
     Premade patterns!<br>
     <button type="button" onclick="show_pattern(0)">Candy Cane</button><br>
-    <button type="button" onclick="show_pattern(1)">Red/Green Twinkle</button><br>
-    <button type="button" onclick="show_pattern(2)">Red/White/Green/Black Circle</button><br>
-    <button type="button" onclick="show_pattern(3)">Red/Yellow/Green/Yellow Circle</button><br>
-    <button type="button" onclick="show_pattern(4)">Rainbow</button><br>
+    <button type="button" onclick="show_pattern(1)">Yellow/White Twinkle</button><br>
+    <button type="button" onclick="show_pattern(2)">Red/Green Twinkle</button><br>
+    <button type="button" onclick="show_pattern(3)">Red/White/Green/Black Circle</button><br>
+    <button type="button" onclick="show_pattern(4)">Red/Yellow/Green/Yellow Circle</button><br>
+    <button type="button" onclick="show_pattern(5)">Rainbow</button><br>
   </div>
   <a href="/admin.html" style="width:150px" class="btn btn--m btn--blue">Network Settings</a>
   <div>Compile Date: <span id=compile_date></span></div>
