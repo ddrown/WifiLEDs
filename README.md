@@ -19,3 +19,5 @@ ws2811 data is on esp8266 pin D5
 NUM\_LEDS is the total # of LEDs to output, set at 100 by default
 
 Default HTTP user/pass is in data/secret.json.  On first boot, it will create an AP with the name "ESPxxxx" where xxxx is the chip id.  The AP WPA password is the same as the HTTP password.  You can set the SSID and password to join through the admin web interface at http://192.168.1.4/admin.html  The HTTP user/pass should also be changed there.
+
+curl.sh has some examples of controlling this interface through curl (for example, from a raspberry pi).  I'm relying on my dhcp server to setup the hostname esp8266fs.lan.  If your dhcp server can't do this, you can use either mdns or the IP.
